@@ -1,3 +1,9 @@
+xf86-video-armsoc (1.9.3ayufan1) testing; urgency=medium
+
+  * Compile for arm64 too
+
+ -- Kamil Trzciński <ayufan@ayufan.eu>  Sun, 17 Dec 2017 12:23:15 +0100
+
 xf86-video-armsoc (1.9.3) testing; urgency=medium
 
   * new

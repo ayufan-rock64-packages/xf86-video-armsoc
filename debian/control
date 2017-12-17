@@ -19,7 +19,7 @@ Build-Depends: debhelper (>= 8),
 Standards-Version: 3.9.4
 
 Package: xserver-xorg-video-armsoc
-Architecture: armel armhf
+Architecture: armel armhf arm64
 Depends: ${misc:Depends}
 Description: X.Org X server -- ARM SoC display driver (transitional package)
  This driver for the X.Org X server (see xserver-xorg for a further
