@@ -3,9 +3,17 @@
 COMMON_CONFIGURE_FLAGS = $(shell dpkg-buildflags --export=configure)
 
 %:
-	dh $@ --with quilt,xsf --builddirectory=build/
+	dh $@ --with quilt,autoreconf,xsf --builddirectory=build/
 
 # create m4 directory before running autoreconf
 override_dh_auto_configure:
 	dh_auto_configure -- --libdir=/usr/lib --with-driver=rockchip
 
+# Install in debian/tmp to retain control through dh_install:
+override_dh_auto_install:
+	dh_auto_install --destdir=debian/tmp
+
+# Kill *.la files, and forget no-one:
+override_dh_install:
+	find debian/tmp -name '*.la' -delete
+	dh_install --fail-missing

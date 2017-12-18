@@ -1,8 +1,8 @@
-xf86-video-armsoc (1.9.3ayufan2) testing; urgency=medium
+xf86-video-armsoc (1.9.3ayufan3) testing; urgency=medium
 
   * Properly build modules
 
- -- Kamil Trzciński <ayufan@ayufan.eu>  Mon, 18 Dec 2017 12:39:21 +0100
+ -- Kamil Trzciński <ayufan@ayufan.eu>  Mon, 18 Dec 2017 12:56:19 +0100
 
 xf86-video-armsoc (1.9.3ayufan1) testing; urgency=medium
 
