@@ -1,3 +1,9 @@
+xf86-video-armsoc (1.9.3ayufan4) testing; urgency=medium
+
+  * Support CursorPlaneType option: 0 - overlay, 2 - cursor
+
+ -- Kamil Trzciński <ayufan@ayufan.eu>  Sun, 04 Mar 2018 22:24:19 +0100
+
 xf86-video-armsoc (1.9.3ayufan3) testing; urgency=medium
 
   * Properly build modules
