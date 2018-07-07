@@ -711,6 +711,8 @@ static Bool
 drmmode_cursor_init_plane(ScreenPtr pScreen, int plane_type)
 {
 	ScrnInfoPtr pScrn = xf86ScreenToScrn(pScreen);
+	xf86CrtcConfigPtr config = XF86_CRTC_CONFIG_PTR(pScrn);
+	xf86OutputPtr output = config->output[config->compat_output];
 	struct drmmode_rec *drmmode = drmmode_from_scrn(pScrn);
 	drmModePlaneRes *plane_resources;
 	int i, j;
@@ -740,13 +742,25 @@ drmmode_cursor_init_plane(ScreenPtr pScreen, int plane_type)
 	for (i = 0; i < plane_resources->count_planes; ++i) {
 		int plane_id;
 		drmModeObjectPropertiesPtr props;
+		drmModePlanePtr plane;
 
 		plane_id = plane_resources->planes[i];
+		plane = drmModeGetPlane(drmmode->fd, plane_id);
+		if (!plane) {
+			drmModeFreePlane(plane);
+			continue;
+		}
+
+		if ((plane->possible_crtcs & output->possible_crtcs) == 0) {
+			continue;
+		}
+
 		props = drmModeObjectGetProperties(drmmode->fd, plane_id,
 				DRM_MODE_OBJECT_PLANE);
 
 		if (!props) {
 			drmModeFreeObjectProperties(props);
+			drmModeFreePlane(plane);
 			continue;
 		}
 
@@ -755,20 +769,31 @@ drmmode_cursor_init_plane(ScreenPtr pScreen, int plane_type)
  			int is_type = !strcmp(this_prop->name, "type");
 			drmModeFreeProperty(this_prop);
 
-			if (is_type && props->prop_values[j] == plane_type) {
-				drmModeFreeObjectProperties(props);
-				drmModeFreePlaneResources(plane_resources);
-				if(drmmode_cursor_init_plane_id(pScreen, plane_id)) {
-					return TRUE;
-				}
-				return FALSE;
+			if (!is_type) {
+				continue;
 			}
+
+			DEBUG_MSG("testing plane(%d) possible_crcts(%d) type(%d)", plane_id, plane->possible_crtcs, (int)props->prop_values[j]);
+
+			if (props->prop_values[j] != plane_type) {
+				continue;
+			}
+		
+			if (drmmode_cursor_init_plane_id(pScreen, plane_id)) {
+				drmModeFreeObjectProperties(props);
+				drmModeFreePlane(plane);
+				drmModeFreePlaneResources(plane_resources);
+				return TRUE;
+			}
+			DEBUG_MSG("HW cursor failed to initalize\n");
+			break;
 		}
 
 		drmModeFreeObjectProperties(props);
+		drmModeFreePlane(plane);
 	}
 
-	ERROR_MSG("not enough planes for HW cursor (%d)", plane_resources->count_planes);
+	ERROR_MSG("plane not found for HW cursor (%d)", plane_resources->count_planes);
 	drmModeFreePlaneResources(plane_resources);
 	return FALSE;
 }
